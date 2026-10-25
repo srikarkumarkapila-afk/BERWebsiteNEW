@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team & Archive | Bearcats Electric Racing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Agency+FB:wght@700&family=Industry:wght@500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e00122;
+      --dark-red: #b8011c;
+      --black: #000000;
+      --white: #ffffff;
+      --gray: #a7a5aa;
+      --card-bg: rgba(10, 10, 10, 0.9);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Industry', sans-serif; font-weight: 500; text-transform: none; background: var(--black); color: var(--white); overflow-x: hidden; position: relative; }
+
+    .page-bg-slideshow {
+      position: fixed; inset: 0; z-index: -3; overflow: hidden; pointer-events: none;
+    }
+    .bg-slide {
+      position: absolute; inset: 0; background-size: cover; background-position: center;
+      opacity: 0; 
+      transition: opacity 3s cubic-bezier(0.4, 0, 0.2, 1), transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: brightness(0.60) contrast(1.15); transform: scale(1.05);
+      will-change: opacity, transform;
+    }
+    .bg-slide.active { opacity: 1; transform: scale(1); }
+    .page-bg-overlay {
+      position: fixed; inset: 0; z-index: -2; pointer-events: none;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.92) 100%);
+    }
+
+    /* Identical Overhanging Logo Nav Bar */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 80px; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(167,165,170,0.15); overflow: visible; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo img { height: 180px; width: auto; object-fit: contain; pointer-events: none; display: block; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; font-weight: 700; text-transform: uppercase; margin: 0; padding: 0; }
+    .nav-links a { font-size: 14px; color: var(--gray); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 4px; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--red); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); border-radius: 2px; }
+    @media (max-width: 768px) { .nav-links { display: none; } .hamburger { display: flex; } .nav-logo img { height: 90px; } }
+
+    .mobile-nav { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.98); flex-direction: column; align-items: center; justify-content: center; gap: 36px; text-transform: uppercase; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-size: 28px; font-weight: 900; color: var(--white); text-decoration: none; }
+    .mobile-nav-close { position: absolute; top: 20px; right: 24px; font-size: 32px; background: none; border: none; color: var(--white); cursor: pointer; }
+
+    .page-header {
+      position: relative; padding: 220px 60px 50px; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .page-header-content { width: 100%; max-width: 1400px; background: var(--card-bg); padding: 60px; border-radius: 20px; border: 1px solid rgba(167,165,170,0.15); backdrop-filter: blur(16px); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .page-title { font-family: 'Agency FB', sans-serif; font-size: clamp(4rem, 9vw, 7.5rem); font-weight: 700; letter-spacing: 1.5px; margin-bottom: 1rem; color: var(--white); line-height: 1; text-transform: uppercase; }
+    .page-subtitle { font-weight: 500; font-size: clamp(1rem, 2vw, 1.25rem); color: var(--gray); line-height: 1.6; max-width: 100%; margin: 0 auto; text-align: center; text-transform: none; }
+
+    .section-heading { font-family: 'Agency FB', sans-serif; font-size: 3.5rem; font-weight: 700; margin-bottom: 30px; letter-spacing: 1.5px; color: var(--white); text-transform: uppercase; }
+
+    .section-wrapper {
+      position: relative; padding: 80px 60px; width: 100%;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(8,8,8,0.85) 15%, rgba(8,8,8,0.85) 85%, rgba(0,0,0,0) 100%);
+      border-top: 1px solid rgba(167,165,170,0.1);
+      border-bottom: 1px solid rgba(167,165,170,0.1);
+    }
+    .container-box {
+      width: 100%; max-width: 1400px; margin: 0 auto; background: var(--card-bg); padding: 60px; border-radius: 20px; border: 1px solid rgba(167,165,170,0.15); backdrop-filter: blur(16px); box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    }
+
+    .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px; width: 100%; }
+    .team-card { background: rgba(0,0,0,0.75); border: 1px solid rgba(167, 165, 170, 0.15); border-radius: 16px; padding: 36px; transition: transform 0.25s ease, border-color 0.25s ease; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+    .team-card:hover { transform: translateY(-6px); border-color: var(--red); }
+    
+    .team-tag { font-weight: 900; font-size: 0.85rem; color: var(--red); letter-spacing: 1.5px; text-transform: uppercase; }
+    .team-name { font-weight: 900; font-size: 1.5rem; color: var(--white); margin-top: 4px; text-transform: uppercase; }
+    .team-desc { font-weight: 500; font-size: 0.95rem; line-height: 1.7; color: var(--gray); text-align: left; text-transform: none; }
+    
+    .component-sketch-box { width: 100%; height: 140px; background: rgba(0,0,0,0.7); border: 1px solid rgba(224, 1, 34, 0.35); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; position: relative; overflow: hidden; margin-top: 15px; }
+    .sketch-label { font-size: 0.75rem; font-weight: 700; color: var(--gray); letter-spacing: 1px; margin-top: 8px; text-transform: uppercase; }
+
+    .team-lead-row { display: flex; align-items: center; gap: 16px; border-top: 1px solid rgba(167,165,170,0.15); padding-top: 16px; margin-top: auto; }
+    .lead-avatar { width: 50px; height: 50px; border-radius: 50%; background: #222; border: 2px solid var(--red); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--white); font-size: 0.9rem; flex-shrink: 0; text-transform: uppercase; }
+    .lead-info h4 { font-weight: 900; font-size: 1rem; color: var(--white); text-transform: uppercase; }
+    .lead-info p { font-weight: 700; font-size: 0.8rem; color: var(--gray); text-transform: uppercase; }
+
+    .archive-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; }
+    .archive-card { background: rgba(0,0,0,0.75); border: 1px solid rgba(167, 165, 170, 0.15); border-radius: 16px; overflow: hidden; transition: transform 0.25s ease, border-color 0.25s ease; display: flex; flex-direction: column; }
+    .archive-card:hover { transform: translateY(-6px); border-color: var(--red); }
+    
+    .archive-img-box { width: 100%; height: 240px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    
+    .archive-img-box img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      filter: brightness(0.9);
+      transition: transform 0.3s ease;
+    }
+    
+    .archive-img-box img.zoom-crop { 
+      transform: scale(1.6);
+      transform-origin: 50% 45%;
+    }
+    .archive-card:hover .archive-img-box img.zoom-crop {
+      transform: scale(1.7);
+    }
+
+    .archive-year-badge { position: absolute; top: 16px; left: 16px; background: var(--red); color: var(--white); padding: 6px 14px; border-radius: 999px; font-weight: 900; font-size: 0.9rem; z-index: 2; text-transform: uppercase; }
+    .archive-body { padding: 30px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1; }
+    .archive-car-title { font-weight: 900; font-size: 1.4rem; color: var(--white); text-transform: uppercase; }
+    .archive-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+    .archive-stat-pill { background: rgba(167,165,170,0.08); border: 1px solid rgba(167,165,170,0.2); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--white); text-transform: uppercase; }
+
+    /* Technical Specifications Table */
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 0.85rem;
+    }
+    .specs-table th, .specs-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(167, 165, 170, 0.15);
+    }
+    .specs-table th {
+      color: var(--red);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .specs-table td {
+      color: var(--white);
+      font-weight: 500;
+    }
+    .specs-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .location-address { font-weight: 500; font-size: 1.05rem; line-height: 1.7; color: var(--gray); text-align: center; margin-top: 10px; text-transform: none; }
+    .map-iframe-wrapper { position: relative; width: 100%; height: 450px; background: #121212; border-radius: 12px; overflow: hidden; margin-top: 25px; }
+    .map-iframe-wrapper iframe { width: 100%; height: 100%; border: 0; border-radius: 12px; filter: invert(0.9) hue-rotate(180deg) contrast(1.2); }
+
+    footer { background: #030303; color: var(--gray); padding: 50px 40px; text-align: center; border-top: 1px solid rgba(167,165,170,0.15); position: relative; z-index: 2; width: 100%; }
+    .footer-content { width: 100%; max-width: 1400px; margin: 0 auto; font-size: 0.85rem; line-height: 1.6; text-align: left; color: var(--gray); font-weight: 500; text-transform: none; }
+    .footer-copyright { margin-top: 20px; font-size: 0.8rem; color: var(--gray); letter-spacing: 0.5px; font-weight: 700; text-align: center; text-transform: uppercase; }
+
+    @media (max-width: 768px) {
+      .section-wrapper { padding: 60px 20px; }
+      .container-box { padding: 30px; }
+      .page-header { padding-top: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-bg-slideshow">
+    <div class="bg-slide active" style="background-image: url('FormulaSAETeam.png');"></div>
+    <div class="bg-slide" style="background-image: url('berheadexpo-76.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('berheadexpo-77.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('25-06-19 BCMS BEV 2025 Comp F-88.jpg');"></div>
+  </div>
+  <div class="page-bg-overlay"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="image_c15922_2.png" alt="Logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="team.html" class="active">Team & Archive</a></li>
+      <li><a href="media.html">Media</a></li>
+      <li><a href="progress.html">Join Us</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <button class="mobile-nav-close" id="mobile-close-btn">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team & Archive</a>
+    <a href="media.html">Media</a>
+    <a href="progress.html">Join Us</a>
+    <a href="sponsors.html">Sponsors</a>
+  </div>
+
+  <header class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">Team & Archive</h1>
+      <p class="page-subtitle">Meet our specialized engineering and organizational departments, connect with team leadership, and explore our historical vehicle development gallery across seasons.</p>
+    </div>
+  </header>
+
+  <section class="section-wrapper">
+    <div class="container-box">
+      <h2 class="section-heading" style="margin-bottom: 30px;">Meet the Sub-Teams</h2>
+      <div class="teams-grid">
+        
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Engineering & Dynamics</div>
+            <h3 class="team-name">Vehicle Dynamics</h3>
+            <p class="team-desc">Focuses on vehicle handling, simulation, suspension kinematics, and tire performance to optimize cornering grip and overall dynamic behavior on track.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <line x1="20" y1="40" x2="90" y2="15" />
+                <line x1="90" y1="15" x2="160" y2="40" />
+                <line x1="55" y1="27" x2="125" y2="27" stroke-dasharray="4 2" />
+                <circle cx="20" cy="40" r="5" fill="#000" />
+                <circle cx="160" cy="40" r="5" fill="#000" />
+                <circle cx="90" cy="15" r="5" fill="#e00122" />
+              </svg>
+              <span class="sketch-label">Suspension A-Arm & Upright Assembly</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">VD</div>
+            <div class="lead-info">
+              <h4>Alex Mercer</h4>
+              <p>Vehicle Dynamics Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Powertrain</div>
+            <h3 class="team-name">Powertrain</h3>
+            <p class="team-desc">Designs and calibrates high-voltage electric motors, inverters, torque vectoring controllers, and custom ECU software algorithms for maximum acceleration.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <rect x="25" y="12" width="50" height="30" rx="4" />
+                <rect x="105" y="12" width="50" height="30" rx="4" />
+                <path d="M75 27 H105 M85 20 L95 27 L85 34" fill="none" />
+              </svg>
+              <span class="sketch-label">Inverter & Motor Control Schematic</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">PT</div>
+            <div class="lead-info">
+              <h4>Marcus Vance</h4>
+              <p>Powertrain Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Energy Storage</div>
+            <h3 class="team-name">Battery</h3>
+            <p class="team-desc">Engineers the high-voltage accumulator pack, custom cell layouts, thermal management systems, spot-welded busbars, and BMS safety monitoring.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <rect x="20" y="15" width="140" height="26" rx="4" />
+                <line x1="55" y1="15" x2="55" y2="41" />
+                <line x1="90" y1="15" x2="90" y2="41" />
+                <line x1="125" y1="15" x2="125" y2="41" />
+              </svg>
+              <span class="sketch-label">Accumulator Cell Modules & Busbars</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">BAT</div>
+            <div class="lead-info">
+              <h4>Sarah Jenkins</h4>
+              <p>Battery Systems Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Structural</div>
+            <h3 class="team-name">Chassis</h3>
+            <p class="team-desc">Develops the tubular space frame or composite structure, validating torsional stiffness using CAD FEA tools and precision welding all mounting nodes.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <polygon points="30,42 90,12 150,42" />
+                <line x1="60" y1="27" x2="120" y2="27" />
+                <line x1="90" y1="27" x2="90" y2="42" />
+              </svg>
+              <span class="sketch-label">Space Frame Torsional Node Truss</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">CHS</div>
+            <div class="lead-info">
+              <h4>David Ross</h4>
+              <p>Chassis Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Electrical</div>
+            <h3 class="team-name">Electronics</h3>
+            <p class="team-desc">Designs custom low-voltage printed circuit boards in Altium, power distribution units, safety shutdown circuits, and vehicle wiring harnesses.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <rect x="35" y="12" width="110" height="30" stroke-dasharray="3 3" />
+                <circle cx="55" cy="27" r="4" fill="#e00122" />
+                <circle cx="125" cy="27" r="4" fill="#e00122" />
+                <line x1="59" y1="27" x2="121" y2="27" />
+              </svg>
+              <span class="sketch-label">Custom PCB Layout & Routing</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">EL</div>
+            <div class="lead-info">
+              <h4>Elena Rostova</h4>
+              <p>Electronics Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Aerodynamics</div>
+            <h3 class="team-name">Aerodynamics</h3>
+            <p class="team-desc">Designs front and rear wings, undertray diffusers, and carbon fiber body panels using CFD simulations to generate maximum cornering downforce.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <path d="M25 35 Q 90 10, 155 30" />
+                <path d="M25 40 Q 90 20, 155 35" stroke-dasharray="4 2" />
+              </svg>
+              <span class="sketch-label">Front Wing Airfoil & Downforce Profile</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">AERO</div>
+            <div class="lead-info">
+              <h4>Liam O'Connor</h4>
+              <p>Aerodynamics Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Mechanical Systems</div>
+            <h3 class="team-name">Drivetrain & Ergonomics</h3>
+            <p class="team-desc">Engineers the power transmission, braking system, pedals, steering wheel interface, driver seating, and safety harness alignment for optimal driver control.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <circle cx="90" cy="27" r="20" stroke-dasharray="5 3" />
+                <circle cx="90" cy="27" r="8" fill="#e00122" />
+              </svg>
+              <span class="sketch-label">Differential Carrier & Pedal Box</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">DT</div>
+            <div class="lead-info">
+              <h4>Jordan Blake</h4>
+              <p>Drivetrain Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Organizational</div>
+            <h3 class="team-name">Business & Sponsorships</h3>
+            <p class="team-desc">Manages corporate partnerships, financial budgeting, competition cost reports, sponsor relations, and the official FSAE business presentation.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <rect x="30" y="15" width="120" height="25" rx="3" />
+                <line x1="30" y1="23" x2="150" y2="23" />
+              </svg>
+              <span class="sketch-label">Budget Allocation & Cost Event Report</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">BUS</div>
+            <div class="lead-info">
+              <h4>Lucy Greco</h4>
+              <p>Business Lead</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div>
+            <div class="team-tag">Organizational</div>
+            <h3 class="team-name">Media & Marketing</h3>
+            <p class="team-desc">Directs graphic design, vehicle livery creation, website management, photography, social media coverage, and community recruitment events.</p>
+            <div class="component-sketch-box">
+              <svg width="180" height="55" viewBox="0 0 180 55" fill="none" stroke="#e00122" stroke-width="2">
+                <rect x="40" y="15" width="100" height="26" rx="4" />
+                <circle cx="70" cy="28" r="6" />
+                <polygon points="110,23 125,28 110,33" fill="#e00122" />
+              </svg>
+              <span class="sketch-label">Vehicle Livery & Digital Media Asset</span>
+            </div>
+          </div>
+          <div class="team-lead-row">
+            <div class="lead-avatar">MED</div>
+            <div class="lead-info">
+              <h4>Maya Patel</h4>
+              <p>Marketing & Media Lead</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrapper">
+    <div class="container-box">
+      <h2 class="section-heading" style="margin-bottom: 30px;">Historical Car Archive</h2>
+      <div class="archive-grid">
+        <div class="archive-card">
+          <div class="archive-img-box">
+            <div class="archive-year-badge">EV 4</div>
+            <img src="IMG_4454.jpg" class="zoom-crop" alt="EV 4 Car #291 on Track">
+          </div>
+          <div class="archive-body">
+            <h3 class="archive-car-title">EV 4 — Generation IV</h3>
+            <p class="team-desc">Our fourth-generation electric contender featured dual EMRAX motors, torque vectoring capability, a 588V tractive battery pack, and a planetary drivetrain system.</p>
+
+            <table class="specs-table">
+              <thead>
+                <tr>
+                  <th>System</th>
+                  <th>Specification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Motor</strong></td>
+                  <td>EMRAX 188 HV LC (Dual Inboard)</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Power</strong></td>
+                  <td>60 kW @ 6500 RPM</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Torque</strong></td>
+                  <td>100 Nm</td>
+                </tr>
+                <tr>
+                  <td><strong>Motor Controller</strong></td>
+                  <td>Cascadia Motion PM100DZ</td>
+                </tr>
+                <tr>
+                  <td><strong>Accumulator Cells</strong></td>
+                  <td>Molicel P30B (INR)</td>
+                </tr>
+                <tr>
+                  <td><strong>Pack Capacity</strong></td>
+                  <td>7.056 kWh (588V Full Charge)</td>
+                </tr>
+                <tr>
+                  <td><strong>Differential</strong></td>
+                  <td>Torque Vectoring (Planetary 3.72)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="archive-stats" style="margin-top: 10px;">
+              <span class="archive-stat-pill">FSAE Michigan: #16 Overall</span>
+              <span class="archive-stat-pill">Endurance: Finished</span>
+              <span class="archive-stat-pill">Design: Top 10</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="archive-card">
+          <div class="archive-img-box">
+            <div class="archive-year-badge">EV 3</div>
+            <img src="CAR.png" alt="EV 3">
+          </div>
+          <div class="archive-body">
+            <h3 class="archive-car-title">EV 3 — Generation III</h3>
+            <p class="team-desc">Our third-generation electric race car featured key technical advancements in motor technology, custom lithium-ion battery integration, and limited-slip drivetrain mechanics.</p>
+
+            <table class="specs-table">
+              <thead>
+                <tr>
+                  <th>System</th>
+                  <th>Specification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Motor</strong></td>
+                  <td>Emrax 208 MV (Axial Flux)</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Power</strong></td>
+                  <td>86 kW @ 6000 RPM</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Torque</strong></td>
+                  <td>150 Nm</td>
+                </tr>
+                <tr>
+                  <td><strong>Motor Controller</strong></td>
+                  <td>Cascadia Motion PM100DX</td>
+                </tr>
+                <tr>
+                  <td><strong>Accumulator Cells</strong></td>
+                  <td>Molicel P45B (INR)</td>
+                </tr>
+                <tr>
+                  <td><strong>Pack Capacity</strong></td>
+                  <td>5.44 kWh (357V Full Charge)</td>
+                </tr>
+                <tr>
+                  <td><strong>Differential</strong></td>
+                  <td>Drexler V3 Limited-Slip</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="archive-stats" style="margin-top: 10px;">
+              <span class="archive-stat-pill">Acceleration: 3.8s</span>
+              <span class="archive-stat-pill">Autocross: Cleared</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="archive-card">
+          <div class="archive-img-box">
+            <div class="archive-year-badge">EV 2</div>
+            <img src="23-12-15 BCMS EV Driving Day F-19.jpg" alt="EV 2 on Driving Day">
+          </div>
+          <div class="archive-body">
+            <h3 class="archive-car-title">EV 2 — Generation II</h3>
+            <p class="team-desc">Our sophomore electric contender focusing on rigorous reliability testing, high-voltage powertrain architecture, and thermal accumulator safety improvements.</p>
+
+            <table class="specs-table">
+              <thead>
+                <tr>
+                  <th>System</th>
+                  <th>Specification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Motor</strong></td>
+                  <td>Emrax 228 Medium Voltage LC (Axial Flux)</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Power</strong></td>
+                  <td>124 kW @ 5500 RPM</td>
+                </tr>
+                <tr>
+                  <td><strong>Peak Torque</strong></td>
+                  <td>220 Nm</td>
+                </tr>
+                <tr>
+                  <td><strong>Motor Controller</strong></td>
+                  <td>Rinehart PM100DZ</td>
+                </tr>
+                <tr>
+                  <td><strong>Accumulator Cells</strong></td>
+                  <td>Molicel INR21700-P42A (21700 Li-Ion)</td>
+                </tr>
+                <tr>
+                  <td><strong>Pack Capacity</strong></td>
+                  <td>5.08 kWh (588V Total)</td>
+                </tr>
+                <tr>
+                  <td><strong>Differential</strong></td>
+                  <td>Rear Drive Assembly</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="archive-stats" style="margin-top: 10px;">
+              <span class="archive-stat-pill">FSAE Michigan: #31 Overall</span>
+              <span class="archive-stat-pill">Safety Inspection: 1st Pass</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrapper">
+    <div class="container-box">
+      <div style="text-align: center;">
+        <h2 class="section-heading" style="margin-bottom: 10px;">Our Location</h2>
+        <p class="location-address">University of Cincinnati &bull; 407 Rhodes Hall &bull; Cincinnati, OH 45221-0072</p>
+      </div>
+      <div class="map-iframe-wrapper">
+        <iframe src="https://maps.google.com/maps?q=39.133042,-84.515762&z=17&output=embed" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <p>Organizations affiliated under the Bearcats Racing Umbrella are registered at the University of Cincinnati. Registration shall not be construed as the University of Cincinnati’s approval, disapproval, endorsement, or sponsorship of the student organization’s publications, activities, statements, purposes, actions, or positions.</p>
+      <div class="footer-copyright">&copy; 2026 Bearcats Electric Racing. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('.page-bg-slideshow .bg-slide');
+    if (slides.length > 1) {
+      let currentIndex = 0;
+      setInterval(() => {
+        slides[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add('active');
+      }, 7000);
+    }
+    const hb = document.getElementById('hamburger-btn');
+    const mn = document.getElementById('mobile-nav');
+    hb.addEventListener('click', () => mn.classList.add('open'));
+    document.getElementById('mobile-close-btn').addEventListener('click', () => mn.classList.remove('open'));
+  </script>
+</body>
+</html>
