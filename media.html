@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Gallery | Bearcats Electric Racing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Agency+FB:wght@700&family=Industry:wght@500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e00122;
+      --dark-red: #b8011c;
+      --black: #000000;
+      --white: #ffffff;
+      --gray: #a7a5aa;
+      --card-bg: rgba(10, 10, 10, 0.9);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Industry', sans-serif; font-weight: 500; text-transform: none; background: var(--black); color: var(--white); overflow-x: hidden; position: relative; }
+
+    /* Unique Theme Background Slideshow & Overlay */
+    .page-bg-slideshow {
+      position: fixed; inset: 0; z-index: -3; overflow: hidden; pointer-events: none;
+    }
+    .bg-slide {
+      position: absolute; inset: 0; background-size: cover; background-position: center;
+      opacity: 0; 
+      transition: opacity 3s cubic-bezier(0.4, 0, 0.2, 1), transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: brightness(0.60) contrast(1.15); transform: scale(1.05);
+      will-change: opacity, transform;
+    }
+    .bg-slide.active { opacity: 1; transform: scale(1); }
+    .page-bg-overlay {
+      position: fixed; inset: 0; z-index: -2; pointer-events: none;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.92) 100%);
+    }
+
+    /* Standardized Overhanging Logo Nav Bar */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 80px; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(167,165,170,0.15); overflow: visible; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; height: 100%; }
+    .nav-logo img { height: 180px; width: auto; object-fit: contain; pointer-events: none; display: block; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; font-family: 'Industry', sans-serif; font-weight: 700; text-transform: uppercase; margin: 0; padding: 0; }
+    .nav-links a { font-size: 14px; letter-spacing: 0.5px; color: var(--gray); text-decoration: none; transition: color 0.2s ease; position: relative; padding: 8px 0; display: inline-block; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-links a.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--red); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); border-radius: 2px; }
+    @media (max-width: 768px) { nav { padding: 0 20px; height: 70px; } .nav-links { display: none; } .hamburger { display: flex; } .nav-logo img { height: 110px; } }
+
+    .mobile-nav { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.98); flex-direction: column; align-items: center; justify-content: center; gap: 36px; text-transform: uppercase; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-size: 28px; font-weight: 900; color: var(--white); text-decoration: none; }
+    .mobile-nav-close { position: absolute; top: 20px; right: 24px; font-size: 32px; background: none; border: none; color: var(--white); cursor: pointer; }
+
+    .page-header { position: relative; padding: 180px 60px 40px; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .page-header-content { width: 100%; max-width: 1400px; background: var(--card-bg); padding: 50px 60px; border-radius: 20px; border: 1px solid rgba(167,165,170,0.15); backdrop-filter: blur(16px); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .page-title { font-family: 'Agency FB', sans-serif; font-size: clamp(3.5rem, 8vw, 6.5rem); font-weight: 700; letter-spacing: 1.5px; margin-bottom: 1rem; color: var(--white); line-height: 1; text-transform: uppercase; }
+    .page-subtitle { font-weight: 500; font-size: clamp(1rem, 2vw, 1.25rem); color: var(--gray); line-height: 1.6; max-width: 900px; margin: 0 auto; text-align: center; }
+
+    .section-wrapper { position: relative; padding: 40px 60px 80px; width: 100%; }
+    .container-box { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 80px; }
+
+    .slot-card { background: var(--card-bg); border: 1px solid rgba(167, 165, 170, 0.15); border-radius: 20px; padding: 40px; backdrop-filter: blur(16px); box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 20px; }
+    .slot-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(167, 165, 170, 0.15); padding-bottom: 16px; }
+    .slot-title-group { display: flex; align-items: center; gap: 16px; }
+    .slot-badge { background: var(--red); color: var(--white); font-weight: 900; font-size: 1rem; padding: 6px 16px; border-radius: 999px; text-transform: uppercase; }
+    .slot-title { font-family: 'Agency FB', sans-serif; font-size: 2.8rem; font-weight: 700; color: var(--white); letter-spacing: 1px; text-transform: uppercase; }
+
+    .carousel-container { position: relative; width: 100%; height: 600px; background: #080808; border-radius: 12px; overflow: hidden; border: 1px solid rgba(167, 165, 170, 0.1); }
+    .carousel-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .carousel-slide.active { opacity: 1; pointer-events: auto; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: contain; background-color: #050505; }
+
+    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.65); color: var(--white); border: 1px solid rgba(255, 255, 255, 0.2); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: background 0.2s, border-color 0.2s, transform 0.2s; user-select: none; }
+    .carousel-btn svg { width: 20px; height: 20px; fill: none; stroke: var(--white); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .carousel-btn:hover { background: var(--red); border-color: var(--red); transform: translateY(-50%) scale(1.08); }
+    .carousel-btn.prev { left: 20px; }
+    .carousel-btn.next { right: 20px; }
+
+    .carousel-dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); cursor: pointer; transition: background 0.3s, transform 0.3s; }
+    .dot.active { background: var(--red); transform: scale(1.3); }
+
+    footer { background: #030303; color: var(--gray); padding: 50px 40px; text-align: center; border-top: 1px solid rgba(167,165,170,0.15); position: relative; z-index: 2; width: 100%; }
+    .footer-content { width: 100%; max-width: 1400px; margin: 0 auto; font-size: 0.85rem; line-height: 1.6; text-align: left; color: var(--gray); font-weight: 500; }
+    .footer-copyright { margin-top: 20px; font-size: 0.8rem; color: var(--gray); letter-spacing: 0.5px; font-weight: 700; text-align: center; text-transform: uppercase; }
+
+    @media (max-width: 768px) { .section-wrapper { padding: 20px; } .slot-card { padding: 20px; } .carousel-container { height: 350px; } .page-header { padding-top: 130px; } }
+  </style>
+</head>
+<body>
+
+  <!-- Completely unique background images distinct from all other pages -->
+  <div class="page-bg-slideshow">
+    <div class="bg-slide active" style="background-image: url('IMG_4267.JPG');"></div>
+    <div class="bg-slide" style="background-image: url('25-06-19 BCMS BEV 2025 Comp F-28.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('IMG_3556.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('25-06-19 BCMS BEV 2025 Comp F-55.jpg');"></div>
+  </div>
+  <div class="page-bg-overlay"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="image_c15922_2.png" alt="Bearcats Electric Racing Logo"></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="team.html">Team & Archive</a></li>
+      <li><a href="media.html" class="active">Media</a></li>
+      <li><a href="progress.html">Join Us</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger-btn" aria-label="Toggle Menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <button class="mobile-nav-close" id="mobile-close-btn">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team & Archive</a>
+    <a href="media.html">Media</a>
+    <a href="progress.html">Join Us</a>
+    <a href="sponsors.html">Sponsors</a>
+  </div>
+
+  <header class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">Media Gallery</h1>
+      <p class="page-subtitle">Explore high-resolution imagery and media captures from our vehicle testing sessions, technical inspection bays, and competition days across generations.</p>
+    </div>
+  </header>
+
+  <section class="section-wrapper">
+    <div class="container-box">
+
+      <div class="slot-card">
+        <div class="slot-header">
+          <div class="slot-title-group">
+            <span class="slot-badge">EV 2</span>
+            <h2 class="slot-title">Generation II Gallery</h2>
+          </div>
+        </div>
+
+        <div class="carousel-container" id="carousel-ev2">
+          <div class="carousel-slide active"><img src="IMG_1072.jpg" alt="EV 2 Team Photo"></div>
+          <div class="carousel-slide"><img src="IMG_1544.jpeg" alt="EV 2 Tech Inspection"></div>
+          <div class="carousel-slide"><img src="IMG_3556.jpg" alt="EV 2 Rear Powertrain Frame"></div>
+          <div class="carousel-slide"><img src="IMG_4267.JPG" alt="EV 2 Track Testing Side Profile"></div>
+          <div class="carousel-slide"><img src="IMG_4280.JPG" alt="EV 2 Dynamic Autocross Testing"></div>
+
+          <button class="carousel-btn prev" onclick="moveSlide('carousel-ev2', -1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn next" onclick="moveSlide('carousel-ev2', 1)" aria-label="Next">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+          <div class="carousel-dots">
+            <span class="dot active" onclick="setSlide('carousel-ev2', 0)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev2', 1)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev2', 2)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev2', 3)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev2', 4)"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot-card">
+        <div class="slot-header">
+          <div class="slot-title-group">
+            <span class="slot-badge">EV 3</span>
+            <h2 class="slot-title">Generation III Gallery</h2>
+          </div>
+        </div>
+
+        <div class="carousel-container" id="carousel-ev3">
+          <div class="carousel-slide active"><img src="25-06-19 BCMS BEV 2025 Comp F-21.jpg" alt="EV 3 Tilt Table Testing"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-28.jpg" alt="EV 3 Rain Test Box"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-30.jpg" alt="EV 3 Driver in Cockpit"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-47.jpg" alt="EV 3 Team Walk on Track"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-49.jpg" alt="EV 3 Car Static View"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-55.jpg" alt="EV 3 Front Suspension Adjustment"></div>
+          <div class="carousel-slide"><img src="25-06-19 BCMS BEV 2025 Comp F-10.jpg" alt="EV 3 Design Tech Review"></div>
+          <div class="carousel-slide"><img src="fsae_ev_25_07660.jpg" alt="EV 3 Track Acceleration Run"></div>
+
+          <button class="carousel-btn prev" onclick="moveSlide('carousel-ev3', -1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn next" onclick="moveSlide('carousel-ev3', 1)" aria-label="Next">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+          <div class="carousel-dots">
+            <span class="dot active" onclick="setSlide('carousel-ev3', 0)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 1)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 2)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 3)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 4)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 5)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 6)"></span>
+            <span class="dot" onclick="setSlide('carousel-ev3', 7)"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot-card">
+        <div class="slot-header">
+          <div class="slot-title-group">
+            <span class="slot-badge">EV 4</span>
+            <h2 class="slot-title">Generation IV Gallery</h2>
+          </div>
+        </div>
+
+        <div class="carousel-container" id="carousel-ev4">
+          <div class="carousel-slide active"><img src="23-12-15 BCMS EV Driving Day F-19.jpg" alt="EV 4 Driving Day"></div>
+
+          <button class="carousel-btn prev" onclick="moveSlide('carousel-ev4', -1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="carousel-btn next" onclick="moveSlide('carousel-ev4', 1)" aria-label="Next">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+          <div class="carousel-dots">
+            <span class="dot active" onclick="setSlide('carousel-ev4', 0)"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <p>Organizations affiliated under the Bearcats Racing Umbrella are registered at the University of Cincinnati. Registration shall not be construed as the University of Cincinnati’s approval, disapproval, endorsement, or sponsorship of the student organization’s publications, activities, statements, purposes, actions, or positions.</p>
+      <div class="footer-copyright">&copy; 2026 Bearcats Electric Racing. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    /* Background Slideshow Script */
+    const bgSlides = document.querySelectorAll('.page-bg-slideshow .bg-slide');
+    if (bgSlides.length > 1) {
+      let bgIndex = 0;
+      setInterval(() => {
+        bgSlides[bgIndex].classList.remove('active');
+        bgIndex = (bgIndex + 1) % bgSlides.length;
+        bgSlides[bgIndex].classList.add('active');
+      }, 7000);
+    }
+
+    const hb = document.getElementById('hamburger-btn');
+    const mn = document.getElementById('mobile-nav');
+    hb.addEventListener('click', () => mn.classList.add('open'));
+    document.getElementById('mobile-close-btn').addEventListener('click', () => mn.classList.remove('open'));
+
+    function updateCarousel(containerId, index) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const slides = container.querySelectorAll('.carousel-slide');
+      const dots = container.querySelectorAll('.dot');
+      if (slides.length === 0) return;
+      let newIndex = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === newIndex));
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === newIndex));
+      container.dataset.currentIndex = newIndex;
+    }
+
+    function moveSlide(containerId, direction) {
+      const container = document.getElementById(containerId);
+      const currentIndex = parseInt(container.dataset.currentIndex || 0);
+      updateCarousel(containerId, currentIndex + direction);
+    }
+
+    function setSlide(containerId, index) {
+      updateCarousel(containerId, index);
+    }
+
+    document.querySelectorAll('.carousel-container').forEach(container => {
+      container.dataset.currentIndex = 0;
+      const slides = container.querySelectorAll('.carousel-slide');
+      if (slides.length > 1) {
+        setInterval(() => { moveSlide(container.id, 1); }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>
